@@ -133,7 +133,7 @@ public class SplitCalculator {
         // 3. Determine distance type based on workout activity
         let distanceType = sampleProcessor.distanceQuantityType(for: workout.workoutActivityType)
 
-        // 4. Fetch distance samples
+        // 4. Fetch distance samples (filtered to workout's source device)
         let samples = try await sampleProcessor.fetchDistanceSamples(
             for: workout,
             distanceType: distanceType,
@@ -144,6 +144,19 @@ public class SplitCalculator {
             throw SplitCalculatorError.noDistanceData
         }
 
+        // Debug: Log sample information
+        #if DEBUG
+        let sampleDistance = samples.reduce(0.0) { $0 + $1.quantity.doubleValue(for: .meter()) }
+        let sourceName = workout.sourceRevision.source.name
+        print("[SplitCalculator] Fetched \(samples.count) samples from '\(sourceName)'")
+        print("[SplitCalculator] Total distance from samples: \(String(format: "%.2f", sampleDistance))m")
+        if let workoutDistance = workout.totalDistance?.doubleValue(for: .meter()) {
+            let diff = abs(sampleDistance - workoutDistance)
+            let percentDiff = (diff / workoutDistance) * 100
+            print("[SplitCalculator] Workout distance: \(String(format: "%.2f", workoutDistance))m (diff: \(String(format: "%.1f%%", percentDiff)))")
+        }
+        #endif
+
         // 5. Get pause intervals if needed
         let pauseIntervals = configuration.excludePausedTime
             ? extractPauseIntervals(from: workout)
@@ -153,7 +166,8 @@ public class SplitCalculator {
         let splits = splitAggregator.calculateSplitsFromSamples(
             samples: samples,
             splitDistance: configuration.splitDistance,
-            pauseIntervals: pauseIntervals
+            pauseIntervals: pauseIntervals,
+            workoutStartDate: workout.startDate
         )
 
         guard !splits.isEmpty else {

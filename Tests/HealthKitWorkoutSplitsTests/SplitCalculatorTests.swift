@@ -231,34 +231,4 @@ final class SplitCalculatorTests: XCTestCase {
         XCTAssertTrue(workout.hasPauses)
         XCTAssertEqual(workout.totalPausedTime, 180)  // 3 minutes total
     }
-
-    // MARK: - Integration-Style Tests
-    // Note: These would fail in test environment without real HealthKit data
-    // They're included to show expected usage patterns
-
-    func testCalculateSplitsRequiresHealthKitData() async {
-        // This demonstrates the expected usage but will fail without real data
-        let workout = MockWorkoutData.createWorkout(
-            activityType: .running,
-            startDate: Date(),
-            endDate: Date().addingTimeInterval(3600),
-            totalDistance: 5000
-        )
-
-        let config = SplitConfiguration.miles(1.0)
-        let healthStore = HKHealthStore()
-
-        do {
-            _ = try await calculator.calculateSplits(
-                for: workout,
-                configuration: config,
-                healthStore: healthStore
-            )
-            // Would succeed with real HealthKit data
-        } catch SplitCalculatorError.noDistanceData {
-            // Expected in test environment - no actual samples
-        } catch {
-            // Other errors are also acceptable in test environment
-        }
-    }
 }

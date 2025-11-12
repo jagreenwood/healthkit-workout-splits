@@ -33,7 +33,8 @@ final class SplitAggregatorTests: XCTestCase {
         let splits = aggregator.calculateSplitsFromSamples(
             samples: samples,
             splitDistance: splitDistance,
-            pauseIntervals: []
+            pauseIntervals: [],
+            workoutStartDate: startDate
         )
 
         // Should get 3 complete mile splits
@@ -65,7 +66,8 @@ final class SplitAggregatorTests: XCTestCase {
         let splits = aggregator.calculateSplitsFromSamples(
             samples: samples,
             splitDistance: splitDistance,
-            pauseIntervals: []
+            pauseIntervals: [],
+            workoutStartDate: startDate
         )
 
         // Should get 2 complete splits + 1 partial
@@ -105,7 +107,8 @@ final class SplitAggregatorTests: XCTestCase {
         let splits = aggregator.calculateSplitsFromSamples(
             samples: [sample1, sample2],
             splitDistance: splitDistance,
-            pauseIntervals: []
+            pauseIntervals: [],
+            workoutStartDate: startDate
         )
 
         // Should get 1 complete split + 1 partial
@@ -133,7 +136,8 @@ final class SplitAggregatorTests: XCTestCase {
         let splits = aggregator.calculateSplitsFromSamples(
             samples: [sample],
             splitDistance: splitDistance,
-            pauseIntervals: []
+            pauseIntervals: [],
+            workoutStartDate: startDate
         )
 
         // Should get 3 complete splits + 1 partial
@@ -159,7 +163,8 @@ final class SplitAggregatorTests: XCTestCase {
         let splits = aggregator.calculateSplitsFromSamples(
             samples: samples,
             splitDistance: splitDistance,
-            pauseIntervals: []
+            pauseIntervals: [],
+            workoutStartDate: startDate
         )
 
         // Should get 1 partial split
@@ -192,7 +197,8 @@ final class SplitAggregatorTests: XCTestCase {
         let splits = aggregator.calculateSplitsFromSamples(
             samples: samples,
             splitDistance: splitDistance,
-            pauseIntervals: [pauseInterval]
+            pauseIntervals: [pauseInterval],
+            workoutStartDate: startDate
         )
 
         // Should have 1 complete split
@@ -227,7 +233,8 @@ final class SplitAggregatorTests: XCTestCase {
         let splits = aggregator.calculateSplitsFromSamples(
             samples: samples,
             splitDistance: splitDistance,
-            pauseIntervals: [pause1, pause2]
+            pauseIntervals: [pause1, pause2],
+            workoutStartDate: startDate
         )
 
         XCTAssertEqual(splits.count, 1)

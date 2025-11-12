@@ -41,24 +41,41 @@ class DistanceSampleProcessor {
     /// Fetches distance samples for a workout
     ///
     /// Queries HealthKit for distance samples that occurred during the workout's
-    /// time period. Samples are sorted by start date in ascending order.
+    /// time period, filtered to only include samples from the same source as the workout.
+    /// This prevents issues with overlapping samples when multiple devices (e.g., iPhone
+    /// and Apple Watch) record distance data simultaneously.
+    ///
+    /// Samples are sorted by start date in ascending order.
     ///
     /// - Parameters:
     ///   - workout: The workout to fetch distance samples for
     ///   - distanceType: The distance quantity type to query
     ///   - healthStore: The HKHealthStore to query
-    /// - Returns: Array of distance samples, sorted by start date
+    /// - Returns: Array of distance samples from the workout's source, sorted by start date
     /// - Throws: Any error from the HealthKit query
     func fetchDistanceSamples(
         for workout: HKWorkout,
         distanceType: HKQuantityType,
         from healthStore: HKHealthStore
     ) async throws -> [HKQuantitySample] {
-        let predicate = HKQuery.predicateForSamples(
+        // Create time predicate for workout duration
+        let timePredicate = HKQuery.predicateForSamples(
             withStart: workout.startDate,
             end: workout.endDate,
             options: .strictStartDate
         )
+
+        // Create source predicate to match workout's source device
+        // This prevents duplicate/overlapping samples from multiple devices
+        let sourcePredicate = HKQuery.predicateForObjects(
+            from: workout.sourceRevision.source
+        )
+
+        // Combine predicates to filter by both time and source
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            timePredicate,
+            sourcePredicate
+        ])
 
         let sortDescriptor = NSSortDescriptor(
             key: HKSampleSortIdentifierStartDate,

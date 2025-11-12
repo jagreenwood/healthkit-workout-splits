@@ -34,7 +34,8 @@ class SplitAggregator {
     func calculateSplitsFromSamples(
         samples: [HKQuantitySample],
         splitDistance: Measurement<UnitLength>,
-        pauseIntervals: [DateInterval]
+        pauseIntervals: [DateInterval],
+        workoutStartDate: Date
     ) -> [WorkoutSplit] {
         guard !samples.isEmpty else { return [] }
 
@@ -43,7 +44,7 @@ class SplitAggregator {
 
         var cumulativeDistance: Double = 0  // in meters
         var currentSplitStartDistance: Double = 0
-        var currentSplitStartTime: Date = samples[0].startDate
+        var currentSplitStartTime: Date = workoutStartDate
         var splitNumber = 1
 
         for sample in samples {
